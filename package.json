@@ -1,0 +1,51 @@
+{
+  "name": "template-nodejs-devops",
+  "version": "0.0.0-development",
+  "description": "Template for Node.js projects with Stone DevOps",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepare": "husky",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write \"src/**/*.{ts,json,md}\""
+  },
+  "keywords": [],
+  "author": "stone",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4",
+    "semantic-release": "^22.0.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stone-home/Template-NodeJS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stone-home/Template-NodeJS/issues"
+  },
+  "homepage": "https://github.com/stone-home/Template-NodeJS#readme",
+  "lint-staged": {
+    "*.tex": [
+      "prettier --write",
+      "textlint"
+    ],
+    "*.{ts,js,json,md}": [
+      "prettier --write"
+    ]
+  }
+}
