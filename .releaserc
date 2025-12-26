@@ -1,6 +1,6 @@
 branches:
   - trunk
-repositoryUrl: "https://github.com/stone-home/Template-NodeJS"
+repositoryUrl: "https://github.com/stone-home/Obsidian-Lib-MKNote"
 plugins:
   - "@semantic-release/commit-analyzer"
   - "@semantic-release/release-notes-generator"
