@@ -43,4 +43,7 @@ export interface IVaultAdapter {
     write(path: string, content: string): Promise<void>;
     exists(path: string): Promise<boolean>;
     rename(oldPath: string, newPath: string): Promise<void>;
+    move(oldPath: string, newPath: string): Promise<void>;
+    getFrontmatter?(path: string): object;
 }
+

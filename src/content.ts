@@ -56,11 +56,14 @@ export class ContentManager {
             if (section.title && section.id !== 'default') {
                 output += `${"#".repeat(section.level)} ${section.title}\n`;
             }
-
             if (section.content.length > 0) {
                 output += section.content.join("\n") + "\n";
+                if (section.content.at(-1) !== "") {
+                    output += "\n";
+                }
+            } else {
+                output += "\n";
             }
-            output += "\n";
         }
         return output.trim();
     }

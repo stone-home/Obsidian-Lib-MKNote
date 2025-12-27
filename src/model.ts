@@ -1,14 +1,11 @@
-// src/lib/core/model.ts
+import { parse } from 'yaml';
 import { FrontmatterManager } from "./frontmatter";
 import { ContentManager } from "./content";
-import { FrontmatterBase } from "./types";
+import { FrontmatterBase, IVaultAdapter } from "./types";
 
 export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
     public path: string;
-
-    // [FIX] Renamed from 'frontmatter' to 'properties' to match tests and your original naming
     public properties: FrontmatterManager<T>;
-
     public content: ContentManager;
 
     constructor(path: string, initialProps?: T) {
@@ -24,58 +21,76 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
     }
 
     /**
-     * Parses raw Markdown content into Frontmatter and Sections.
+     * Factory method that replaces the static 'fromFile'.
+     * It uses an adapter to remain environment-agnostic.
      */
-    public setContent(rawContent: string): void {
+    public static async load<T extends FrontmatterBase = FrontmatterBase>(
+        adapter: IVaultAdapter,
+        path: string
+    ): Promise<NoteModel<T>> {
+        const rawContent = await adapter.read(path);
+
+        // Use optimized frontmatter from adapter if available (e.g., Obsidian MetadataCache)
+        let externalProps: T | undefined;
+        if (adapter.getFrontmatter) {
+            externalProps = adapter.getFrontmatter(path) as T;
+        }
+
+        const instance = new NoteModel<T>(path);
+
+        // If we have pre-parsed props, we skip parsing them from the string again
+        instance.setContent(rawContent, externalProps);
+        return instance;
+    }
+
+    /**
+     * Parses raw Markdown content.
+     * @param rawContent - The raw content of given markdown file
+     * @param externalProps - A frontmatter object parsed by the function parsed by the adapter.
+     */
+    // src/model.ts
+    public setContent(rawContent: string, externalProps?: T): void {
         const fmRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
         const match = rawContent.match(fmRegex);
 
         if (match) {
-            this.parseFrontmatter(match[1]);
-            this.parseBody(match[2]);
+            const [, rawYaml, bodyContent] = match;
+
+            // Use external props (from adapter cache) or parse them from raw string
+            const props = externalProps || this.parseFrontmatter(rawYaml);
+
+            // Sync into the properties manager to ensure consistency
+            if (props) {
+                Object.entries(props).forEach(([k, v]) => {
+                    this.properties.set(k as keyof T, v as T[keyof T]);
+                });
+            }
+            this.parseBody(bodyContent);
         } else {
             this.parseBody(rawContent);
         }
     }
 
+    public async moveTo(adapter: IVaultAdapter, newPath: string): Promise<void> {
+        await adapter.move(this.path, newPath);
+        this.path = newPath;
+    }
+
     public serialize(): string {
-        // [FIX] Updated to use this.properties
         return this.properties.toString() + this.content.toString();
     }
 
-    private parseFrontmatter(yaml: string): void {
-        const lines = yaml.split("\n");
-        let currentKey = "";
-
-        for (const line of lines) {
-            if (!line.trim()) continue;
-
-            const keyVal = line.match(/^(\w+):\s*(.*)$/);
-            const listVal = line.match(/^\s*-\s+(.*)$/);
-
-            if (keyVal) {
-                currentKey = keyVal[1];
-                let val: any = keyVal[2].trim();
-
-                if (val === "true") val = true;
-                if (val === "false") val = false;
-                if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
-                if (val === "[]") val = [];
-
-                // [FIX] Updated to use this.properties
-                // We use 'as any' here because parsing raw strings into strict T is hard without a validation library
-                this.properties.set(currentKey as any, val);
-            } else if (listVal && currentKey) {
-                // [FIX] Updated to use this.properties
-                const existing = this.properties.get(currentKey as any);
-                const item = listVal[1].replace(/^"|"$/g, '');
-
-                if (Array.isArray(existing)) {
-                    existing.push(item);
-                } else {
-                    this.properties.set(currentKey as any, [item] as any);
-                }
-            }
+    /**
+     * Refactored: Now returns an object instead of updating 'this.properties' directly.
+     * This mimics the behavior of the yaml.parse() function.
+     */
+    private parseFrontmatter(yaml: string): T {
+        try {
+            const data = parse(yaml);
+            return (data && typeof data === 'object') ? (data as T) : ({} as T);
+        } catch (error) {
+            console.error("Failed to parse YAML frontmatter:", error);
+            return {} as T;
         }
     }
 

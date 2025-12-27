@@ -1,4 +1,4 @@
-import { ContentManager } from './content';
+import { ContentManager } from '../../src/content';
 
 describe('ContentManager', () => {
     let content: ContentManager;

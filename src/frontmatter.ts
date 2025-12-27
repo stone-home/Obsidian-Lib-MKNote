@@ -28,7 +28,7 @@ export class FrontmatterManager<T extends FrontmatterBase = FrontmatterBase> {
      */
     public set<K extends keyof T>(key: K, value: T[K]): void {
         if (value === undefined || value === null) {
-            this.properties.delete(key as string);
+            this.properties.set(key as string, "");
         } else {
             this.properties.set(key as string, value);
         }

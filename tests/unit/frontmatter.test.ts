@@ -1,5 +1,5 @@
-import { FrontmatterManager } from './frontmatter';
-import { FrontmatterBase } from './types';
+import { FrontmatterManager } from '../../src/frontmatter';
+import { FrontmatterBase } from '../../src/types';
 
 // Define a "Strict" interface for testing Scenario B
 interface TestZettel extends FrontmatterBase {
@@ -33,6 +33,16 @@ describe('FrontmatterManager', () => {
             fm.remove('temp');
             expect(fm.get('temp')).toBeUndefined();
         });
+
+        it("check functionability of has", () => {
+            const fm = new FrontmatterManager();
+            fm.set('title', 'My Note');
+            expect(fm.has('title')).toBe(true);
+            fm.remove('title');
+            expect(fm.has('title')).toBe(false);
+        })
+
+
     });
 
     // ==========================================
@@ -72,6 +82,22 @@ describe('FrontmatterManager', () => {
             fm.addTag(['new', 'existing']); // 'existing' is duplicate
 
             expect(fm.get('tags')).toEqual(['existing', 'new']);
+        });
+
+        it("Check functionability of 'addTag'", () => {
+            const fm = new FrontmatterManager();
+            fm.addTag('My Note');
+            const tags = fm.get('tags') as string[];
+            expect(fm.has('tags')).toBe(true);
+            expect(Array.isArray(tags)).toBe(true);
+            expect(tags.length).toBe(1);
+
+            fm.addTag('My Note 2');
+            const new_tags = fm.get('tags') as string[];
+            expect(Array.isArray(new_tags)).toBe(true);
+            expect(new_tags.length).toBe(2);
+
+
         });
     });
 
