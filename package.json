@@ -29,7 +29,12 @@
     "semantic-release": "^25.0.2",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "yaml": "^2.8.2",
+    "obsidian": "latest"
+  },
+  "peerDependencies": {
+    "obsidian": "latest"
   },
   "repository": {
     "type": "git",
@@ -47,9 +52,5 @@
     "*.{ts,js,json,md}": [
       "prettier --write"
     ]
-  },
-  "dependencies": {
-    "yaml": "^2.8.2",
-    "obsidian": "latest"
   }
 }

@@ -10,6 +10,7 @@ module.exports = {
     ...tsJestTransformCfg,
   },
   moduleNameMapper: {
+    '^obsidian$': '<rootDir>/__mocks__/obsidian.ts',
     '^@src/(.*)$': '<rootDir>/src/$1',
     '^@fixtures/(.*)$': '<rootDir>/tests/fixtures/$1',
   },

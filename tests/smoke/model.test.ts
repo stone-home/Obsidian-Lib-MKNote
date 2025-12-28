@@ -1,8 +1,18 @@
+import * as fs from "fs"
 import * as path from 'path';
-import { NoteModel } from '../../src/model';
-import { NodeFileAdapter } from '../../src/adapters/localfs-adapter';
+import { NoteModel, NodeFileAdapter, FrontmatterBase } from '../../src';
 import { IZettelProperties } from '../../src/notes/types';
-import { FrontmatterBase } from '../../src/types';
+
+
+// Define the interface based on the Zotero literature note structure
+interface LiteratureNote extends FrontmatterBase {
+    id: string;
+    title: string;
+    type: string;
+    aliases: string[];
+    year: string;
+    tags: string[];
+}
 
 
 describe('NoteModel Smoke Test', () => {
@@ -39,19 +49,20 @@ describe('NoteModel Smoke Test', () => {
         expect(output).toContain('title: A - Linguistics');
         expect(output).toContain('# ⚡️Key Points');
     });
+
+    it('Verify whether generated data can be same as the original data', async () => {
+        const note = await NoteModel.load<IZettelProperties>(adapter, featureFilePath);
+        const generatedData = note.serialize()
+        expect(generatedData).toBeDefined();
+
+        const originalData = fs.readFileSync(featureFilePath, "utf-8");
+        expect(generatedData).toBe(originalData);
+    })
 });
 
 
 
-// Define the interface based on the Zotero literature note structure
-interface LiteratureNote extends FrontmatterBase {
-    id: string;
-    title: string;
-    type: string;
-    aliases: string[];
-    year: string;
-    tags: string[];
-}
+
 
 describe('NoteModel Complex Scenario Smoke Test', () => {
     // Assuming the file is saved at this path for the test
@@ -102,4 +113,13 @@ describe('NoteModel Complex Scenario Smoke Test', () => {
         expect(serialized).toContain('🔥🔥🔥everything above this line');
         expect(serialized).toContain('%% begin notes %%');
     });
+
+    it('Verify whether generated data can be same as the original data', async () => {
+        const note = await NoteModel.load<IZettelProperties>(adapter, complexFilePath);
+        const generatedData = note.serialize()
+        expect(generatedData).toBeDefined();
+
+        const originalData = fs.readFileSync(complexFilePath, "utf-8");
+        expect(generatedData).toBe(originalData);
+    })
 });
