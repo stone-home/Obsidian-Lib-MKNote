@@ -1,11 +1,11 @@
-import { FrontmatterBase } from "./types";
+import { INoteFrontmatter } from "./types";
 
 /**
  * Manages the YAML frontmatter of a note.
  * * @template T - The specific interface for your properties (e.g., IZettelProperties).
  * Defaults to a generic object if not specified.
  */
-export class FrontmatterManager<T extends FrontmatterBase = FrontmatterBase> {
+export class FrontmatterManager<T extends INoteFrontmatter = INoteFrontmatter> {
     private properties: Map<string, unknown>;
 
     constructor(initial: T = {} as T) {

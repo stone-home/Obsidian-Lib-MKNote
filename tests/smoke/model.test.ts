@@ -1,7 +1,16 @@
 import * as fs from "fs"
 import * as path from 'path';
 import { NoteModel, NodeFileAdapter, FrontmatterBase } from '../../src';
-import { IZettelProperties } from '../../src/notes/types';
+
+
+interface IZettelProperties extends FrontmatterBase {
+    id: string;
+    title: string;
+    type: string;
+    aliases: string[];
+    tags: string[];
+    sources: string[];
+}
 
 
 // Define the interface based on the Zotero literature note structure

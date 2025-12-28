@@ -1,5 +1,6 @@
 import { NoteModel } from '../../src/model';
 import { IVaultAdapter } from '../../src/types';
+import { NodeFileAdapter } from "../../src/adapters"
 
 describe('NoteModel', () => {
     it('should parse a complete markdown file', () => {
@@ -13,7 +14,7 @@ Content 1
 ## Section 2
 Content 2
 `;
-        const note = new NoteModel('test.md');
+        const note = new NoteModel(new NodeFileAdapter(), 'test.md');
         note.setContent(raw);
 
         // Check Frontmatter
@@ -33,7 +34,7 @@ Content 2
         const raw = `# Just Header
 Some text`;
 
-        const note = new NoteModel('simple.md');
+        const note = new NoteModel(new NodeFileAdapter(), 'simple.md');
         note.setContent(raw);
 
         expect(note.properties.toString()).toBe(''); // Empty FM
@@ -41,7 +42,7 @@ Some text`;
     });
 
     it('should serialize back to string exactly', () => {
-        const note = new NoteModel('demo.md');
+        const note = new NoteModel(new NodeFileAdapter(),'demo.md');
 
         note.properties.set('id', 123);
         note.content.addSection('Main', 1, ['Text']);
@@ -81,7 +82,7 @@ describe('NoteModel Unit Tests', () => {
 
     it('should parse raw content manually when no cached properties are provided', () => {
         const raw = '---\nid: 123\n---\n# Body\nText';
-        const note = new NoteModel('test.md');
+        const note = new NoteModel(mockAdapter,'test.md');
 
         // Manual parsing without skipFrontmatter
         note.setContent(raw);
@@ -91,15 +92,15 @@ describe('NoteModel Unit Tests', () => {
     });
 
     it('should update path internally after a moveTo call', async () => {
-        const note = new NoteModel('old/path.md');
-        await note.moveTo(mockAdapter, 'new/path.md');
+        const note = new NoteModel(mockAdapter,'old/path.md');
+        await note.moveTo('new/path.md');
 
         expect(mockAdapter.move).toHaveBeenCalledWith('old/path.md', 'new/path.md');
         expect(note.path).toBe('new/path.md'); //
     });
 
     it('should serialize properties and content into a valid Markdown string', () => {
-        const note = new NoteModel('demo.md');
+        const note = new NoteModel(mockAdapter,'demo.md');
         note.properties.set('tags', ['unit-test']);
         note.content.addSection('Target', 1, ['Success']);
 

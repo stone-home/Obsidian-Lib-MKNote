@@ -7,8 +7,10 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
     public path: string;
     public properties: FrontmatterManager<T>;
     public content: ContentManager;
+    private adapter: IVaultAdapter;
 
-    constructor(path: string, initialProps?: T) {
+    constructor(adapter: IVaultAdapter, path: string, initialProps?: T) {
+        this.adapter = adapter;
         this.path = path;
         this.properties = new FrontmatterManager<T>(initialProps);
         this.content = new ContentManager();
@@ -23,10 +25,14 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
     /**
      * Factory method that replaces the static 'fromFile'.
      * It uses an adapter to remain environment-agnostic.
+     * @param adapter - Give adapter of notes' manipulation
+     * @param path - Markdown file path
+     * @param defaults - Default values to fill missing fields.
      */
     public static async load<T extends FrontmatterBase = FrontmatterBase>(
         adapter: IVaultAdapter,
-        path: string
+        path: string,
+        defaults: Partial<T> = {}
     ): Promise<NoteModel<T>> {
         const rawContent = await adapter.read(path);
 
@@ -36,10 +42,10 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
             externalProps = adapter.getFrontmatter(path) as T;
         }
 
-        const instance = new NoteModel<T>(path);
+        const instance = new NoteModel<T>(adapter, path);
 
         // If we have pre-parsed props, we skip parsing them from the string again
-        instance.setContent(rawContent, externalProps);
+        instance.setContent(rawContent, externalProps, defaults);
         return instance;
     }
 
@@ -47,9 +53,14 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
      * Parses raw Markdown content.
      * @param rawContent - The raw content of given markdown file
      * @param externalProps - A frontmatter object parsed by the function parsed by the adapter.
+     * @param defaults - Default values to fill missing fields.
      */
     // src/model.ts
-    public setContent(rawContent: string, externalProps?: T): void {
+    public setContent(
+        rawContent: string,
+        externalProps?: T,
+        defaults: Partial<T> = {}
+    ): void {
         const fmRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
         const match = rawContent.match(fmRegex);
 
@@ -58,10 +69,11 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
 
             // Use external props (from adapter cache) or parse them from raw string
             const props = externalProps || this.parseFrontmatter(rawYaml);
+            const finalProps = { ...defaults, ...props } as T;
 
             // Sync into the properties manager to ensure consistency
             if (props) {
-                Object.entries(props).forEach(([k, v]) => {
+                Object.entries(finalProps).forEach(([k, v]) => {
                     this.properties.set(k as keyof T, v as T[keyof T]);
                 });
             }
@@ -71,8 +83,8 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
         }
     }
 
-    public async moveTo(adapter: IVaultAdapter, newPath: string): Promise<void> {
-        await adapter.move(this.path, newPath);
+    public async moveTo(newPath: string): Promise<void> {
+        await this.adapter.move(this.path, newPath);
         this.path = newPath;
     }
 
