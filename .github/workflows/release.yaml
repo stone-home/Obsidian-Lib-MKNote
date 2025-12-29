@@ -2,11 +2,6 @@ name: Release
 on: workflow_dispatch
 jobs:
   release:
-    permissions:
-      contents: write # To create releases/tags
-      id-token: write # Required for OIDC/Trusted Publishing
-      issues: write # to be able to comment on released issues
-      pull-requests: write # to be able to comment on released pull requests
     uses: stone-home/Action-Stone-DevOps/.github/workflows/w-v2-release.yaml@trunk
     with:
       version-id: ${{ github.event.release.name }}
