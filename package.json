@@ -4,6 +4,9 @@
   "description": "The lib is designed as a library for Obsidian Plugin to manipulate markdown files",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "publishConfig": {
+    "provenance": true
+  },
   "scripts": {
     "prepare": "husky",
     "build": "tsc",
@@ -38,12 +41,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stone-home/Template-NodeJS.git"
+    "url": "git+https://github.com/stone-home/Obsidian-Lib-MKNote.git"
   },
   "bugs": {
-    "url": "https://github.com/stone-home/Template-NodeJS/issues"
+    "url": "https://github.com/stone-home/Obsidian-Lib-MKNote.git/issues"
   },
-  "homepage": "https://github.com/stone-home/Template-NodeJS#readme",
+  "homepage": "https://github.com/stone-home/Obsidian-Lib-MKNote.git#readme",
   "lint-staged": {
     "*.tex": [
       "prettier --write",
