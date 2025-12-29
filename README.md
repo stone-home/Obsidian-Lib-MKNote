@@ -63,6 +63,10 @@ await adapter.write(note.path, finalContent);
 
 ```
 
+## Class Diagram
+![](./docs/note%20class%20diagram.png)
+
+
 ## Core Components
 
 ### FrontmatterManager
