@@ -1,8 +1,14 @@
 /**
- * Generates a string for the current date.
- * @param ISOFormat - If true, returns the date in full ISO format (YYYY-MM-DDTHH:mm:ss.sssZ).
- * If false (default), returns the date as YYYY-MM-DD.
+ * Generates a string representing the current date.
+ * Useful for timestamps or file naming conventions.
+ *
+ * @param {boolean} [ISOFormat=false] - If true, returns the full ISO string (e.g., `2023-10-05T14:48:00.000Z`).
+ * If false, returns only the date portion (e.g., `2023-10-05`).
  * @returns {string} The formatted date string.
+ *
+ * @example
+ * generateDate(); // "2023-10-05"
+ * generateDate(true); // "2023-10-05T14:48:00.000Z"
  */
 export function generateDate(ISOFormat: boolean = false): string {
     let date: string = new Date().toISOString();
@@ -13,8 +19,13 @@ export function generateDate(ISOFormat: boolean = false): string {
 }
 
 /**
- * Generates a unique ID based on the current timestamp and a random number.
- * @returns {string} A unique string ID.
+ * Generates a robust unique ID suitable for Zettelkasten notes.
+ * Combines a base-36 timestamp with a base-36 random number to ensure uniqueness.
+ *
+ * @returns {string} A unique alphanumeric string ID.
+ *
+ * @example
+ * const id = generateZettelID(); // e.g. "ln8x9j2k5y1z"
  */
 export function generateZettelID(): string {
     // Date.now() provides temporal uniqueness.
@@ -25,10 +36,14 @@ export function generateZettelID(): string {
 }
 
 /**
- * Generates a random integer between min and max (inclusive).
- * @param min - Minimum value
- * @param max - Maximum value
- * @returns {number} Random integer
+ * Generates a cryptographically insecure random integer between a minimum and maximum value (inclusive).
+ *
+ * @param {number} min - The minimum possible value.
+ * @param {number} max - The maximum possible value.
+ * @returns {number} A random integer between min and max.
+ *
+ * @example
+ * const roll = generateRandomInt(1, 6); // Returns 1, 2, 3, 4, 5, or 6
  */
 export function generateRandomInt(min: number, max: number): number {
     const result = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -36,9 +51,17 @@ export function generateRandomInt(min: number, max: number): number {
 }
 
 /**
- * Sanitizes a filename by removing or replacing invalid characters.
- * @param filename - The filename to sanitize
- * @returns {string} Sanitized filename
+ * Sanitizes a string to make it safe for use as a filename on most operating systems.
+ * - Replaces invalid characters (`<`, `>`, `:`, `"`, `/`, `\`, `|`, `?`, `*`) with dashes.
+ * - Replaces spaces with dashes.
+ * - Collapses multiple dashes into one.
+ * - Trims leading and trailing dashes.
+ *
+ * @param {string} filename - The raw filename string.
+ * @returns {string} The sanitized, safe filename.
+ *
+ * @example
+ * sanitizeFilename("My Note: Part 1?"); // "My-Note-Part-1"
  */
 export function sanitizeFilename(filename: string): string {
     // Remove or replace characters that are invalid in filenames
@@ -51,12 +74,20 @@ export function sanitizeFilename(filename: string): string {
     return sanitized;
 }
 
-
 /**
- * Formats a date string for display.
- * @param dateString - ISO date string
- * @param format - Format type ('short', 'long', 'time')
- * @returns {string} Formatted date string
+ * Formats a raw date string into a localized string for display purposes.
+ * Currently configured for Chinese locale (`zh-CN`).
+ *
+ * @param {string} dateString - A valid date string (e.g., ISO 8601).
+ * @param {"short" | "long" | "time"} [format="short"] - The desired output format.
+ * - `short`: "YYYY/M/D"
+ * - `long`: "YYYY年M月D日"
+ * - `time`: "YYYY/M/D HH:mm:ss"
+ * @returns {string} The formatted date string.
+ *
+ * @example
+ * formatDate("2023-01-01"); // "2023/1/1"
+ * formatDate("2023-01-01", "long"); // "2023年1月1日"
  */
 export function formatDate(
     dateString: string,
@@ -85,22 +116,27 @@ export function formatDate(
     return formatted;
 }
 
-
 /**
- * Validates if a string is a valid note type.
- * @param type - The type string to validate
- * @returns {boolean} True if valid note type
+ * Validates whether a provided string matches one of the known Zettelkasten note types.
+ *
+ * @param {string} type - The note type to check.
+ * @returns {boolean} `true` if valid, `false` otherwise.
+ *
+ * @example
+ * isValidNoteType("Atomic"); // true
+ * isValidNoteType("random"); // false
  */
 export function isValidNoteType(type: string): boolean {
     const validTypes = ["fleeting", "literature", "atomic", "permanent"];
     return validTypes.includes(type.toLowerCase());
 }
 
-
 /**
- * Extracts tags from a string of comma-separated values.
- * @param tagString - Comma-separated tag string
- * @returns {string[]} Array of trimmed tags
+ * Parses a comma-separated string into an array of individual tags.
+ * Handles trimming whitespace and removing empty entries.
+ *
+ * @param {string} tagString - The raw string input (e.g., "pkm,  obsidian ,, coding").
+ * @returns {string[]} An array of cleaned tags (e.g., `["pkm", "obsidian", "coding"]`).
  */
 export function parseTags(tagString: string): string[] {
     if (!tagString || tagString.trim() === "") {
@@ -116,9 +152,14 @@ export function parseTags(tagString: string): string[] {
 }
 
 /**
- * Capitalizes the first letter of a string.
- * @param str - String to capitalize
- * @returns {string} Capitalized string
+ * Capitalizes the first letter of a given string.
+ * Returns the original string if it is empty or null.
+ *
+ * @param {string} str - The input string.
+ * @returns {string} The string with the first character uppercase.
+ *
+ * @example
+ * capitalize("obsidian"); // "Obsidian"
  */
 export function capitalize(str: string): string {
     if (!str) return str;
@@ -127,10 +168,15 @@ export function capitalize(str: string): string {
 }
 
 /**
- * Truncates a string to a specified length with ellipsis.
- * @param str - String to truncate
- * @param maxLength - Maximum length
- * @returns {string} Truncated string
+ * Truncates a string to a maximum length and appends an ellipsis (`...`) if truncated.
+ * Use this for UI elements where space is limited (e.g., sidebars).
+ *
+ * @param {string} str - The string to truncate.
+ * @param {number} maxLength - The maximum character length allowed (including the ellipsis).
+ * @returns {string} The truncated string.
+ *
+ * @example
+ * truncate("Hello World", 8); // "Hello..."
  */
 export function truncate(str: string, maxLength: number): string {
     if (!str || str.length <= maxLength) {

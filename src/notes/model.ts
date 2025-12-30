@@ -148,13 +148,7 @@ export class ZettelNoteModel<T extends FrontmatterBase = ZettelkastenNoteFrontma
     public applyConfigTemplate(config: NoteTemplateConfig): void {
         // 1. Apply Properties
         if (config.properties) {
-            for (const [key, value] of Object.entries(config.properties)) {
-                // Only set if the property doesn't already exist to prevent overwriting core fields (ID, Date)
-                if (!this.properties.has(key)) {
-                    // Type assertion to bridge Record<string, unknown> with the generic T
-                    this.properties.set(key as keyof T, value as T[keyof T]);
-                }
-            }
+            this.properties.batchUpdate(config.properties as T)
         }
 
         // 2. Apply Sections
