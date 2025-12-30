@@ -1,6 +1,6 @@
 {
   "name": "markdown-note-orm",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "The lib is designed as a library for Obsidian Plugin to manipulate markdown files",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
