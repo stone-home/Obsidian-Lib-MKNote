@@ -150,3 +150,30 @@ describe('FrontmatterManager', () => {
         });
     });
 });
+
+
+interface TestProps extends FrontmatterBase {
+    title: string;
+    tags: string[];
+    author?: string; // Optional field used for testing additions
+}
+
+describe('FrontmatterManager Logic', () => {
+    it('batchUpdate should merge arrays and ignore existing scalars', () => {
+        // 2. Explicitly type the manager to allow the 'author' property
+        const fm = new FrontmatterManager<TestProps>({
+            title: "Original Title",
+            tags: ["tag1"]
+        });
+
+        fm.batchUpdate({
+            title: "New Title", // Will be ignored by the manager's logic
+            tags: ["tag2"],     // Will be merged into the existing array
+            author: "User"      // Now valid because it is defined in TestProps
+        });
+
+        expect(fm.get('title')).toBe("Original Title");
+        expect(fm.get('tags')).toEqual(["tag1", "tag2"]);
+        expect(fm.get('author')).toBe("User");
+    });
+});
