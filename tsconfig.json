@@ -1,17 +1,20 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",
-//    "moduleResolution": "node",
-//    "types": ["node", "obsidian"],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "types": ["node", "obsidian", "jest"],
     "lib": ["ES2022"],
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "obsidian": ["./src/__mocks__/obsidian.ts"]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts"]
+  "include": ["src/**/*", "tests/**/*", "__mocks__/**/*"],
+  "exclude": ["node_modules"]
 }
