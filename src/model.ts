@@ -22,6 +22,28 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
         return filename.replace(/\.md$/, "");
     }
 
+    public async moveTo(newPath: string): Promise<void> {
+        await this.adapter.move(this.path, newPath);
+        this.path = newPath;
+    }
+
+    public async rename(newPath: string): Promise<void> {
+        await this.adapter.rename(this.path, newPath);
+        this.path = newPath;
+    }
+
+    public async exist(): Promise<boolean> {
+        return await this.adapter.exists(this.path);
+    }
+
+    public async delete(): Promise<void> {
+        await this.adapter.delete(this.path);
+    }
+
+    public async save(): Promise<void> {
+        await this.adapter.write(this.path, this.serialize())
+    }
+
     /**
      * Factory method that replaces the static 'fromFile'.
      * It uses an adapter to remain environment-agnostic.
@@ -83,10 +105,7 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
         }
     }
 
-    public async moveTo(newPath: string): Promise<void> {
-        await this.adapter.move(this.path, newPath);
-        this.path = newPath;
-    }
+
 
     public serialize(): string {
         return this.properties.toString() + this.content.toString();

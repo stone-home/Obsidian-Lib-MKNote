@@ -1,5 +1,6 @@
 import { FrontmatterBase } from "../types";
 
+
 export interface ZettelkastenNoteFrontmatter extends FrontmatterBase {
     title: string,
     id: string,
@@ -63,3 +64,4 @@ export interface NoteTypeMap {
     permanent: PermanentFrontmatter;
     atom: AtomFrontmatter;
 }
+
