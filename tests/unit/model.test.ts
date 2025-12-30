@@ -63,6 +63,7 @@ const mockAdapter: IVaultAdapter = {
     write: jest.fn().mockResolvedValue(undefined),
     exists: jest.fn().mockResolvedValue(true),
     move: jest.fn().mockResolvedValue(undefined),
+    delete: jest.fn().mockResolvedValue(undefined),
     rename: jest.fn().mockResolvedValue(undefined),
     getFrontmatter: jest.fn().mockReturnValue({ title: 'Cached Title' })
 };

@@ -1,33 +1,47 @@
-import {App} from "obsidian";
-import {NoteModel} from "../model";
-import {ObsidianVaultAdapter} from "../adapters";
-import {NOTE_TYPE_DEFAULTS, NoteType} from "./config";
-import {NoteTypeMap} from "./types";
-import { generateDate, generateZettelID } from "../utils"
+import { App } from "obsidian";
+import { generateDate, generateZettelID } from "../utils";
+import { ObsidianVaultAdapter } from "../adapters";
+import { NOTE_TYPE_DEFAULTS, NoteType } from "./config";
+import { NoteTypeMap, NoteTemplateConfig } from "./types";
+import { ZettelNoteModel } from "./model";
 
 /**
- * Factory class for creating and loading specialized Obsidian NoteModels.
- * Handles automatic data merging, adapter injection, and content initialization.
+ * Factory class for creating and loading specialized Obsidian ZettelNoteModels.
+ * * This class implements the Factory Pattern to simplify the instantiation of notes.
+ * It handles the boilerplate of injecting the `ObsidianVaultAdapter`, generating
+ * unique IDs, and applying template configurations so that the rest of the plugin
+ * can create notes with a single method call.
  */
 export class ObsidianNoteFactory {
     /**
-     * Creates a new NoteModel with default frontmatter and initial content sections.
-     * * @template K - A specific note type from NoteTypeMap.
-     * @param app - The Obsidian App instance.
-     * @param path - The vault-relative path where the note will be created.
-     * @param type - The type of note (e.g., 'fleeting', 'literature').
-     * @param title - The display title of the note.
-     * @returns A Promise resolving to a type-safe NoteModel.
+     * Creates a new `ZettelNoteModel` with pre-populated default frontmatter
+     * and optional content sections based on a template.
+     * * @template K - A valid note type key (e.g., 'fleeting', 'literature').
+     * @param {App} app - The global Obsidian App instance.
+     * @param {string} path - The vault-relative path (including extension) where the note will exist.
+     * @param {K} type - The classification for the new note.
+     * @param {string} title - The human-readable title to be stored in the frontmatter.
+     * @param {NoteTemplateConfig} [config] - Optional configuration to apply specific YAML fields or body sections.
+     * * @returns {Promise<ZettelNoteModel<NoteTypeMap[K]>>} A promise resolving to an initialized note model.
+     * * @example
+     * const note = await ObsidianNoteFactory.createByType(
+     * this.app,
+     * "Inbox/New Thought.md",
+     * "fleeting",
+     * "New Thought"
+     * );
+     * await note.save();
      */
     public static async createByType<K extends NoteType>(
         app: App,
         path: string,
         type: K,
-        title: string
-    ): Promise<NoteModel<NoteTypeMap[K]>> {
+        title: string,
+        config?: NoteTemplateConfig
+    ): Promise<ZettelNoteModel<NoteTypeMap[K]>> {
         const adapter = new ObsidianVaultAdapter(app);
 
-        // Merge defaults with mandatory initialization fields
+        // Merge static defaults from config with runtime-generated metadata
         const initialData: NoteTypeMap[K] = {
             ...NOTE_TYPE_DEFAULTS[type],
             title: title,
@@ -35,28 +49,41 @@ export class ObsidianNoteFactory {
             create: generateDate()
         };
 
-        // Initialize NoteModel with the bound adapter and complete properties
-        return new NoteModel<NoteTypeMap[K]>(adapter, path, initialData);
+        // Initialize the model with the Obsidian-specific adapter
+        const note = new ZettelNoteModel<NoteTypeMap[K]>(adapter, path, initialData);
+
+        // Apply additional user-defined template structures if provided
+        if (config) {
+            note.applyConfigTemplate(config);
+        }
+        return note;
     }
 
     /**
-     * Loads an existing note and applies default properties to ensure data completeness.
-     * Useful for legacy notes missing new frontmatter fields.
-     * * @template K - A specific note type from NoteTypeMap.
-     * @param app - The Obsidian App instance.
-     * @param path - The path to the existing Markdown file.
-     * @param type - The expected note type for default value merging.
-     * @returns A Promise resolving to a NoteModel with patched properties.
+     * Loads an existing Markdown file from the vault and transforms it into a `ZettelNoteModel`.
+     * * This method is particularly useful for "upgrading" legacy notes. It parses the
+     * existing file but ensures that any missing frontmatter fields required by the
+     * specified `type` are filled with default values.
+     * * @template K - A valid note type key.
+     * @param {App} app - The global Obsidian App instance.
+     * @param {string} path - The path to the existing Markdown file.
+     * @param {K} type - The expected type used to determine the fallback default values.
+     * * @returns {Promise<ZettelNoteModel<NoteTypeMap[K]>>} A promise resolving to a model representing the existing file.
+     * * @example
+     * // Load an old note and ensure it has all 'literature' fields
+     * const note = await ObsidianNoteFactory.loadAndPatch(this.app, "Archive/OldNote.md", "literature");
+     * console.log(note.properties.get("type")); // "literature"
      */
     public static async loadAndPatch<K extends NoteType>(
         app: App,
         path: string,
         type: K
-    ): Promise<NoteModel<NoteTypeMap[K]>> {
+    ): Promise<ZettelNoteModel<NoteTypeMap[K]>> {
         const adapter = new ObsidianVaultAdapter(app);
 
-        // NoteModel.load internally handles the merging of defaults and file data
-        return await NoteModel.load<NoteTypeMap[K]>(
+        // ZettelNoteModel.load internally handles reading the file and merging
+        // the default values with the actual data found on disk.
+        return await ZettelNoteModel.load<NoteTypeMap[K]>(
             adapter,
             path,
             NOTE_TYPE_DEFAULTS[type]
