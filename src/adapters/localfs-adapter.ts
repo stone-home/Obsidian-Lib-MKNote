@@ -34,6 +34,10 @@ export class NodeFileAdapter implements IVaultAdapter {
         await this.move(oldPath, newPath);
     }
 
+    public async delete(filePath: string): Promise<void> {
+        await fs.unlink(this.getFullPath(filePath)); //
+    }
+
     public async move(oldPath: string, newPath: string): Promise<void> {
         const fullOldPath = this.getFullPath(oldPath);
         const fullNewPath = this.getFullPath(newPath);

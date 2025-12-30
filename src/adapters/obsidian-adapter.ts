@@ -48,6 +48,15 @@ export class ObsidianVaultAdapter implements IVaultAdapter {
         }
     }
 
+    public async delete(path: string): Promise<void> {
+        const file = this.app.vault.getAbstractFileByPath(normalizePath(path));
+        if (file instanceof TFile) {
+            await this.app.vault.trash(file, true); //
+        } else {
+            throw new Error(`Delete failed: File not found at ${path}`);
+        }
+    }
+
     public getFrontmatter(path: string): object {
         const file = this.app.vault.getAbstractFileByPath(normalizePath(path));
         if (file instanceof TFile) {
