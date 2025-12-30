@@ -65,3 +65,20 @@ export interface NoteTypeMap {
     atom: AtomFrontmatter;
 }
 
+
+/**
+ * Configuration structure for graphical templates in settings
+ */
+export interface NoteTemplateSection {
+    title: string;
+    level: number;
+    content: string[];
+}
+
+export interface NoteTemplateConfig {
+    /** Preset frontmatter properties (e.g., tags, specific fields) */
+    properties?: Record<string, unknown>;
+    /** Preset body sections and their initial content */
+    sections?: NoteTemplateSection[];
+}
+

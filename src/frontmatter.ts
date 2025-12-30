@@ -27,11 +27,7 @@ export class FrontmatterManager<T extends INoteFrontmatter = INoteFrontmatter> {
      * TypeScript ensures 'value' matches the type defined in T for this key.
      */
     public set<K extends keyof T>(key: K, value: T[K]): void {
-        if (value === undefined || value === null) {
-            this.properties.set(key as string, "");
-        } else {
-            this.properties.set(key as string, value);
-        }
+        this.properties.set(key as string, value);
     }
 
     /**
@@ -52,12 +48,32 @@ export class FrontmatterManager<T extends INoteFrontmatter = INoteFrontmatter> {
      * Specific helper for Tags (always handy to have).
      */
     public addTag(tag: string | string[]): void {
-        const currentTags = (this.properties.get("tags") as string[]) || [];
-        const newTags = Array.isArray(tag) ? tag : [tag];
+        const propName = "tags"
+        if (!this.properties.has(propName)) {
+            this.properties.set(propName, []);
+        }
+        this.insertElement("tags", tag)
+    }
 
-        // Merge and remove duplicates
-        const merged = Array.from(new Set([...currentTags, ...newTags]));
-        this.properties.set("tags", merged);
+    protected insertElement(k: string, v: string| string[]): void {
+        const currentValue = this.properties.get(k)
+        if (Array.isArray(currentValue)) {
+            const newValue = Array.isArray(v) ? v : [v];
+            const merged = Array.from(new Set([...currentValue, ...newValue]));
+            this.properties.set(k, merged as T[keyof T]);
+        }
+    }
+
+    public batchUpdate(properties: T): void {
+        Object.entries(properties).forEach(([k, v]) => {
+            if (!this.properties.has(k)) {
+                this.properties.set(k, v);
+            } else {
+                if (Array.isArray(this.properties.get(k))) {
+                    this.insertElement(k, v as string| string[])
+                }
+            }
+        });
     }
 
     /**
@@ -107,7 +123,11 @@ export class FrontmatterManager<T extends INoteFrontmatter = INoteFrontmatter> {
             }
             // Case 2: Single Values (Strings, Numbers, Booleans)
             else {
-                output += `${key}: ${this.formatValue(value)}\n`;
+                let _value = value
+                if (_value === null || _value === undefined) {
+                    _value = ""
+                }
+                output += `${key}: ${this.formatValue(_value)}\n`;
             }
         }
 

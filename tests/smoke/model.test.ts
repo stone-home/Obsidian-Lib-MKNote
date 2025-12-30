@@ -70,9 +70,6 @@ describe('NoteModel Smoke Test', () => {
 });
 
 
-
-
-
 describe('NoteModel Complex Scenario Smoke Test', () => {
     // Assuming the file is saved at this path for the test
     const complexFilePath = path.join(__dirname, '../features/test-long-markdown.md');

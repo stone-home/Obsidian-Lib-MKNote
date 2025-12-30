@@ -1,6 +1,6 @@
 import {NoteModel} from "../model"
 import {FrontmatterBase, IVaultAdapter} from "../types";
-import {ZettelkastenNoteFrontmatter} from "./types"
+import {ZettelkastenNoteFrontmatter, NoteTemplateConfig} from "./types"
 
 
 export interface INoteLink {
@@ -85,6 +85,7 @@ export class NoteLink implements INoteLink {
 export class ZettelNoteModel<T extends FrontmatterBase = ZettelkastenNoteFrontmatter> extends NoteModel<T> {
     public relevantNotes: NoteLink[]
 
+
     constructor(adapter: IVaultAdapter, path: string, initialProps?: T) {
         super(adapter, path, initialProps)
         this.relevantNotes = []
@@ -109,7 +110,7 @@ export class ZettelNoteModel<T extends FrontmatterBase = ZettelkastenNoteFrontma
     }
 
     public async save(): Promise<void> {
-        await super.save();
+        await this.adapter.write(this.path, this.serialize())
         for (const targetLink of this.relevantNotes) {
             await targetLink.link()
         }
@@ -137,5 +138,31 @@ export class ZettelNoteModel<T extends FrontmatterBase = ZettelkastenNoteFrontma
         const instance = new ZettelNoteModel<T>(adapter, path);
         instance.setContent(rawContent, externalProps, defaults);
         return instance;
+    }
+
+    /**
+     * Applies a graphical template configuration to this model.
+     * This merges properties and appends sections without needing a Markdown file.
+     * @param config - The template configuration from plugin settings.
+     */
+    public applyConfigTemplate(config: NoteTemplateConfig): void {
+        // 1. Apply Properties
+        if (config.properties) {
+            for (const [key, value] of Object.entries(config.properties)) {
+                // Only set if the property doesn't already exist to prevent overwriting core fields (ID, Date)
+                if (!this.properties.has(key)) {
+                    // Type assertion to bridge Record<string, unknown> with the generic T
+                    this.properties.set(key as keyof T, value as T[keyof T]);
+                }
+            }
+        }
+
+        // 2. Apply Sections
+        if (config.sections) {
+            for (const section of config.sections) {
+                // ContentManager handles section creation or content appending
+                this.content.addSection(section.title, section.level, section.content);
+            }
+        }
     }
 }

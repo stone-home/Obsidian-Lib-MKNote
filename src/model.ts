@@ -7,7 +7,7 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
     public path: string;
     public properties: FrontmatterManager<T>;
     public content: ContentManager;
-    private adapter: IVaultAdapter;
+    protected adapter: IVaultAdapter;
 
     constructor(adapter: IVaultAdapter, path: string, initialProps?: T) {
         this.adapter = adapter;
@@ -95,17 +95,13 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
 
             // Sync into the properties manager to ensure consistency
             if (props) {
-                Object.entries(finalProps).forEach(([k, v]) => {
-                    this.properties.set(k as keyof T, v as T[keyof T]);
-                });
+                this.properties.batchUpdate(finalProps)
             }
             this.parseBody(bodyContent);
         } else {
             this.parseBody(rawContent);
         }
     }
-
-
 
     public serialize(): string {
         return this.properties.toString() + this.content.toString();
@@ -115,7 +111,7 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
      * Refactored: Now returns an object instead of updating 'this.properties' directly.
      * This mimics the behavior of the yaml.parse() function.
      */
-    private parseFrontmatter(yaml: string): T {
+    protected parseFrontmatter(yaml: string): T {
         try {
             const data = parse(yaml);
             return (data && typeof data === 'object') ? (data as T) : ({} as T);
@@ -125,7 +121,7 @@ export class NoteModel<T extends FrontmatterBase = FrontmatterBase> {
         }
     }
 
-    private parseBody(body: string): void {
+    protected parseBody(body: string): void {
         const lines = body.split("\n");
         let currentSectionTitle = "default";
         let currentLevel = 1;
