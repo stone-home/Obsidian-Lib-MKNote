@@ -1,7 +1,7 @@
 import { App } from "obsidian";
 import { generateDate, generateZettelID } from "../utils";
 import { ObsidianVaultAdapter } from "../adapters";
-import { NOTE_TYPE_DEFAULTS, NoteType } from "./config";
+import { NOTE_TYPE_DEFAULTS, NoteType, isValidNoteType } from "./config";
 import { NoteTypeMap, NoteTemplateConfig } from "./types";
 import { ZettelNoteModel } from "./model";
 
@@ -67,26 +67,28 @@ export class ObsidianNoteFactory {
      * * @template K - A valid note type key.
      * @param {App} app - The global Obsidian App instance.
      * @param {string} path - The path to the existing Markdown file.
-     * @param {K} type - The expected type used to determine the fallback default values.
      * * @returns {Promise<ZettelNoteModel<NoteTypeMap[K]>>} A promise resolving to a model representing the existing file.
      * * @example
      * // Load an old note and ensure it has all 'literature' fields
      * const note = await ObsidianNoteFactory.loadAndPatch(this.app, "Archive/OldNote.md", "literature");
      * console.log(note.properties.get("type")); // "literature"
      */
-    public static async loadAndPatch<K extends NoteType>(
+    public static async loadAndPatch(
         app: App,
         path: string,
-        type: K
-    ): Promise<ZettelNoteModel<NoteTypeMap[K]>> {
+    ): Promise<ZettelNoteModel<NoteTypeMap[NoteType]>> {
         const adapter = new ObsidianVaultAdapter(app);
+        const rawFM = adapter.getFrontmatter(path);
+        const typeFromFM = rawFM?.type;
 
-        // ZettelNoteModel.load internally handles reading the file and merging
-        // the default values with the actual data found on disk.
-        return await ZettelNoteModel.load<NoteTypeMap[K]>(
+        const finalType: NoteType = isValidNoteType(typeFromFM) ? typeFromFM : "fleeting";
+        const defaults = NOTE_TYPE_DEFAULTS[finalType];
+
+        return await ZettelNoteModel.load(
             adapter,
             path,
-            NOTE_TYPE_DEFAULTS[type]
+            defaults
         );
+
     }
 }

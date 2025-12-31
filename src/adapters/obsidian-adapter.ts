@@ -109,11 +109,11 @@ export class ObsidianVaultAdapter implements IVaultAdapter {
      * const fm = adapter.getFrontmatter("Notes/Ideas.md");
      * console.log(fm.tags);
      */
-    public getFrontmatter(path: string): object {
+    public getFrontmatter(path: string): Record<string, any> {
         const file = this.app.vault.getAbstractFileByPath(normalizePath(path));
         if (file instanceof TFile) {
             const cache = this.app.metadataCache.getFileCache(file);
-            return cache?.frontmatter || {};
+            return (cache?.frontmatter as Record<string, any>) || {};
         }
         return {};
     }

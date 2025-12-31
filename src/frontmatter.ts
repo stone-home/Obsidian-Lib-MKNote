@@ -17,7 +17,7 @@ import { INoteFrontmatter } from "./types";
  * const manager = new FrontmatterManager<MyProps>(initialData);
  */
 export class FrontmatterManager<T extends INoteFrontmatter = INoteFrontmatter> {
-    private properties: Map<string, unknown>;
+    private properties: Map<string, any>;
 
     /**
      * Creates a new instance of FrontmatterManager.
@@ -164,10 +164,10 @@ export class FrontmatterManager<T extends INoteFrontmatter = INoteFrontmatter> {
      * Applies link processing for strings.
      *
      * @private
-     * @param {unknown} value - The value to format.
+     * @param {any} value - The value to format.
      * @returns {string} The string representation of the value.
      */
-    private formatValue(value: unknown): string {
+    private formatValue(value: any): string {
         if (typeof value === 'string') {
             return this.linkStringProcess(value);
         }
