@@ -5,6 +5,15 @@ import { NoteTypeMap } from "./types";
  */
 export type NoteType = keyof NoteTypeMap;
 
+
+/**
+ * Type Guard to safely check if a string is a valid NoteType at runtime.
+ * This prevents TS7053 when indexing NOTE_TYPE_DEFAULTS with dynamic strings.
+ */
+export function isValidNoteType(type: string): type is NoteType {
+    return type in NOTE_TYPE_DEFAULTS;
+}
+
 /**
  * Common default values shared across all note types.
  * These properties form the "Base" of the Zettelkasten frontmatter,

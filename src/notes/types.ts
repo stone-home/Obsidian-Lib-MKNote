@@ -35,7 +35,7 @@ export interface FleetingFrontmatter extends ZettelkastenNoteFrontmatter {
     /** The original source URL or reference link where the information was captured. */
     url: string;
     /** Allows for additional arbitrary YAML keys. */
-    [key: string]: unknown;
+    [key: string]: any;
 }
 
 /**
@@ -51,7 +51,7 @@ export interface LiteratureFrontmatter extends ZettelkastenNoteFrontmatter {
     /** List of CSS classes to trigger specific Obsidian workspace styling or themes. */
     cssclasses: Array<string>;
     /** Allows for additional arbitrary YAML keys. */
-    [key: string]: unknown;
+    [key: string]: any;
 }
 
 /**
@@ -67,7 +67,7 @@ export interface PermanentFrontmatter extends ZettelkastenNoteFrontmatter {
     /** Custom CSS classes for visual differentiation in Obsidian. */
     cssclasses: Array<string>;
     /** Allows for additional arbitrary YAML keys. */
-    [key: string]: unknown;
+    [key: string]: any;
 }
 
 /**
@@ -81,7 +81,7 @@ export interface AtomFrontmatter extends ZettelkastenNoteFrontmatter {
     /** Source link for the specific concept. */
     url: string;
     /** Allows for additional arbitrary YAML keys. */
-    [key: string]: unknown;
+    [key: string]: any;
 }
 
 /**
@@ -120,7 +120,7 @@ export interface NoteTemplateSection {
  */
 export interface NoteTemplateConfig {
     /** Preset frontmatter properties (YAML fields). */
-    properties?: Record<string, unknown>;
+    properties?: Record<string, any>;
     /** Preset body sections to be generated in order. */
     sections?: NoteTemplateSection[];
 }

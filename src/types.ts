@@ -4,7 +4,7 @@
  * Base type for frontmatter data, representing a loose key-value object.
  * Used as the fundamental constraint for any frontmatter structure.
  */
-export type FrontmatterBase = Record<string, unknown>;
+export type FrontmatterBase = Record<string, any>;
 
 /**
  * A flexible type definition for Note Frontmatter (YAML metadata).
