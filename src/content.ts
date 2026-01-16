@@ -36,6 +36,19 @@ export class ContentManager {
     }
 
     /**
+     * Clears all sections and resets the content manager to its initial empty state.
+     * This removes all stored sections and clears the section order.
+     * * @example
+     * content.addSection("Notes", 1, ["Some text"]);
+     * content.clear();
+     * console.log(content.toString()); // Output is empty string
+     */
+    public clear(): void {
+        this.sections.clear();
+        this.sectionOrder = [];
+    }
+
+    /**
      * Adds a new section or appends content to an existing one if the ID matches.
      *
      * @param {string} title - The title of the section.

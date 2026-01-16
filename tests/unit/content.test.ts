@@ -60,4 +60,42 @@ describe('ContentManager', () => {
         // We use trim() to ignore trailing newline differences
         expect(output.trim()).toBe(expected.trim());
     });
+
+    it('should clear all content and sections', () => {
+        content.addSection('Intro', 1, ['Start text']);
+        content.addSection('Body', 2, ['Middle text']);
+
+        // Act
+        content.clear();
+
+        // Assert: String output should be empty
+        expect(content.toString()).toBe('');
+
+        // Assert: Specific sections should no longer exist
+        const section = content.getSection('Intro');
+        expect(section).toBeUndefined();
+    });
+
+    it('should handle clearing an already empty manager safely', () => {
+        // Act
+        content.clear();
+
+        // Assert
+        expect(content.toString()).toBe('');
+    });
+
+    it('should allow adding new content after clearing', () => {
+        // Arrange
+        content.addSection('Old Section', 1, ['Old Data']);
+        content.clear();
+
+        // Act
+        content.addSection('New Section', 1, ['New Data']);
+
+        // Assert
+        const output = content.toString();
+        expect(output).toContain('New Section');
+        expect(output).toContain('New Data');
+        expect(output).not.toContain('Old Section');
+    });
 });
