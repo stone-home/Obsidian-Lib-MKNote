@@ -30,8 +30,6 @@ export interface ZettelkastenNoteFrontmatter extends FrontmatterBase {
  * * @extends ZettelkastenNoteFrontmatter
  */
 export interface FleetingFrontmatter extends ZettelkastenNoteFrontmatter {
-    /** Indicates if the note is newly created and requires review or processing. */
-    new: boolean;
     /** The original source URL or reference link where the information was captured. */
     url: string;
     /** Allows for additional arbitrary YAML keys. */
@@ -44,8 +42,6 @@ export interface FleetingFrontmatter extends ZettelkastenNoteFrontmatter {
  * * @extends ZettelkastenNoteFrontmatter
  */
 export interface LiteratureFrontmatter extends ZettelkastenNoteFrontmatter {
-    /** Indicates if the literature review is pending further synthesis. */
-    new: boolean;
     /** Link to the original source material. */
     url: string;
     /** List of CSS classes to trigger specific Obsidian workspace styling or themes. */
@@ -60,8 +56,6 @@ export interface LiteratureFrontmatter extends ZettelkastenNoteFrontmatter {
  * * @extends ZettelkastenNoteFrontmatter
  */
 export interface PermanentFrontmatter extends ZettelkastenNoteFrontmatter {
-    /** Indicates if the permanent note is in a draft or polished state. */
-    new: boolean;
     /** Reference URL if this permanent note is derived from a specific external entity. */
     url: string;
     /** Custom CSS classes for visual differentiation in Obsidian. */
@@ -76,8 +70,6 @@ export interface PermanentFrontmatter extends ZettelkastenNoteFrontmatter {
  * * @extends ZettelkastenNoteFrontmatter
  */
 export interface AtomFrontmatter extends ZettelkastenNoteFrontmatter {
-    /** Indicates if the atom is newly extracted and needs refinement. */
-    new: boolean;
     /** Source link for the specific concept. */
     url: string;
     /** Allows for additional arbitrary YAML keys. */

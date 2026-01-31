@@ -50,7 +50,6 @@ export const NOTE_TYPE_DEFAULTS: { [K in NoteType]: NoteTypeMap[K] } = {
     fleeting: {
         ...COMMON_DEFAULTS,
         type: "fleeting",
-        new: true,
         url: ""
     },
     /** * Defaults for Literature Notes:
@@ -59,7 +58,6 @@ export const NOTE_TYPE_DEFAULTS: { [K in NoteType]: NoteTypeMap[K] } = {
     literature: {
         ...COMMON_DEFAULTS,
         type: "literature",
-        new: true,
         url: "",
         cssclasses: []
     },
@@ -70,7 +68,6 @@ export const NOTE_TYPE_DEFAULTS: { [K in NoteType]: NoteTypeMap[K] } = {
     permanent: {
         ...COMMON_DEFAULTS,
         type: "permanent",
-        new: false,
         url: "",
         cssclasses: []
     },
@@ -80,7 +77,6 @@ export const NOTE_TYPE_DEFAULTS: { [K in NoteType]: NoteTypeMap[K] } = {
     atom: {
         ...COMMON_DEFAULTS,
         type: "atom",
-        new: true,
         url: ""
     }
 };
