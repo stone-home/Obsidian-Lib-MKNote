@@ -89,6 +89,5 @@ export class ObsidianNoteFactory {
             path,
             defaults
         );
-
     }
 }
